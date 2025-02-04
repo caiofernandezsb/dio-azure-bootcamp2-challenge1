@@ -1,0 +1,28 @@
+# Azure DevOps Pipeline for Deploying CPF Validation API (Azure Functions)
+
+trigger:
+  - main  
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureSubscription: 'AZURE_SERVICE_CONNECTION'  
+  functionAppName: 'AZURE_FUNCTION_NAME'  
+  pythonVersion: '3.10'
+
+steps:
+  - task: UsePythonVersion@0
+    displayName: 'Set Python Version'
+    inputs:
+      versionSpec: '$(pythonVersion)'
+
+  - script: |
+      python -m venv .venv
+      source .venv/bin/activate
+      pip install -r requirements.txt
+    displayName: 'Install Dependencies'
+
+  - script: |
+      func azure functionapp publish $(functionAppName) --python
+    displayName: 'Deploy to Azure Functions'
